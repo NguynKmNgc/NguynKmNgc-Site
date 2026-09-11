@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="My Web Tools - Bộ công cụ web đơn giản, nhanh và tiện dụng.">
+  <meta name="theme-color" content="#0f172a">
+  <title>My Web Tools</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#" aria-label="My Web Tools - Trang chủ">
+        <span class="brand-icon">⚡</span>
+        <span>My Web Tools</span>
+      </a>
+
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện">
+        🌙
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <p class="eyebrow">TOOLS • SIMPLE • FAST</p>
+      <h1>Bộ công cụ của tôi</h1>
+      <p class="hero-text">
+        Những công cụ nhỏ, hữu ích và chạy trực tiếp trên trình duyệt.
+      </p>
+
+      <div class="search-box">
+        <span>⌕</span>
+        <input id="searchInput" type="search" placeholder="Tìm công cụ..." autocomplete="off">
+        <kbd>Ctrl</kbd><kbd>K</kbd>
+      </div>
+    </section>
+
+    <section class="tools-section" aria-labelledby="toolsTitle">
+      <div class="section-heading">
+        <div>
+          <h2 id="toolsTitle">Công cụ</h2>
+          <p id="toolCount">4 công cụ</p>
+        </div>
+      </div>
+
+      <div class="tools-grid" id="toolsGrid">
+        <article class="tool-card" data-name="calculator máy tính calculator">
+          <div class="tool-icon">🧮</div>
+          <div class="tool-content">
+            <h3>Calculator</h3>
+            <p>Máy tính cơ bản ngay trên trình duyệt.</p>
+          </div>
+          <button class="open-btn" data-tool="calculator" type="button">Mở</button>
+        </article>
+
+        <article class="tool-card" data-name="countdown đếm ngược timer">
+          <div class="tool-icon">⏱️</div>
+          <div class="tool-content">
+            <h3>Countdown</h3>
+            <p>Đếm ngược đến một ngày và thời gian cụ thể.</p>
+          </div>
+          <button class="open-btn" data-tool="countdown" type="button">Mở</button>
+        </article>
+
+        <article class="tool-card" data-name="number converter chuyển đổi số">
+          <div class="tool-icon">🔢</div>
+          <div class="tool-content">
+            <h3>Number Converter</h3>
+            <p>Chuyển đổi nhị phân, thập phân và thập lục phân.</p>
+          </div>
+          <button class="open-btn" data-tool="converter" type="button">Mở</button>
+        </article>
+
+        <article class="tool-card" data-name="color picker màu color">
+          <div class="tool-icon">🎨</div>
+          <div class="tool-content">
+            <h3>Color Picker</h3>
+            <p>Chọn màu và lấy mã HEX, RGB, HSL.</p>
+          </div>
+          <button class="open-btn" data-tool="color" type="button">Mở</button>
+        </article>
+      </div>
+
+      <div class="no-results" id="noResults" hidden>
+        Không tìm thấy công cụ phù hợp.
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="modal" id="toolModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div>
+          <p class="modal-label">MY WEB TOOLS</p>
+          <h2 id="modalTitle">Tool</h2>
+        </div>
+        <button class="close-btn" id="closeModal" type="button" aria-label="Đóng">×</button>
+      </div>
+
+      <div class="modal-body" id="modalBody"></div>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <span>My Web Tools</span>
+      <span>•</span>
+      <span>Made with HTML, CSS & JavaScript</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
