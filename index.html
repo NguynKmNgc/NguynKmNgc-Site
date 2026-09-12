@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Nhập Mã Nhận Tiền</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background-color: white;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+        input:focus {
+            border-color: #9face6;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            min-height: 20px;
+        }
+        .error { color: #e74c3c; }
+        .success { color: #2ecc71; }
+        
+        /* Ẩn phần chính ban đầu */
+        #main-section {
+            display: none;
+        }
+        .balance-box {
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PHẦN ĐĂNG NHẬP -->
+    <div class="container" id="login-section">
+        <h2>Đăng Nhập</h2>
+        <input type="text" id="username" placeholder="Tên người dùng">
+        <input type="password" id="password" placeholder="Mật khẩu">
+        <button onclick="login()">Vào web</button>
+        <div id="login-msg" class="message error"></div>
+    </div>
+
+    <!-- PHẦN NHẬP MÃ (NẰM ẨN BÊN TRONG) -->
+    <div class="container" id="main-section">
+        <h2>Nhận Thưởng</h2>
+        <div class="balance-box">Số dư: $<span id="balance">0</span></div>
+        <input type="text" id="giftcode" placeholder="Nhập mã 10 ký tự in hoa">
+        <button onclick="redeemCode()">Xác nhận mã</button>
+        <div id="redeem-msg" class="message"></div>
+    </div>
+
+    <script>
+        // 1. Dữ liệu tài khoản giấu trong file
+        const VALID_USER = "NguynKmNgc";
+        const VALID_PASS = "22012011";
+
+        // 2. Danh sách 10 mã (chỉ chứa chữ, in hoa, 10 ký tự)
+        const secretCodes = [
+            "AJFHGKLDES",
+            "BNCXZMQPEW",
+            "VGHURITOSK",
+            "PLMNKOIJBH",
+            "UYTREWQSDF",
+            "ZXCVBNMASD",
+            "QWERTYUIOP",
+            "LKJHGFDSAZ",
+            "MNBVCXZPOY",
+            "TGREDWSQAZ"
+        ];
+        
+        // Mảng lưu trữ các mã đã được sử dụng
+        let usedCodes = [];
+        let currentBalance = 0;
+
+        // Hàm Đăng Nhập
+        function login() {
+            const user = document.getElementById("username").value.trim();
+            const pass = document.getElementById("password").value.trim();
+            const loginMsg = document.getElementById("login-msg");
+
+            if (user === VALID_USER && pass === VALID_PASS) {
+                // Đăng nhập đúng: Ẩn phần đăng nhập, hiện phần chính
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("main-section").style.display = "block";
+            } else {
+                // Đăng nhập sai
+                loginMsg.innerText = "Tên người dùng hoặc mật khẩu không chính xác. Vui lòng nhập lại!";
+            }
+        }
+
+        // Hàm Nhập Mã
+        function redeemCode() {
+            const inputField = document.getElementById("giftcode");
+            let code = inputField.value.trim().toUpperCase(); // Tự động chuyển thành in hoa nếu người dùng gõ chữ thường
+            const redeemMsg = document.getElementById("redeem-msg");
+
+            // Kiểm tra tính hợp lệ
+            if (code.length !== 10) {
+                redeemMsg.className = "message error";
+                redeemMsg.innerText = "Mã không chính xác (phải đủ 10 ký tự). Vui lòng nhập lại!";
+                return;
+            }
+
+            // Kiểm tra mã có nằm trong danh sách không
+            if (secretCodes.includes(code)) {
+                // Kiểm tra mã đã dùng chưa
+                if (usedCodes.includes(code)) {
+                    redeemMsg.className = "message error";
+                    redeemMsg.innerText = "Mã này đã hết hạn (chỉ được sử dụng 1 lần).";
+                } else {
+                    // Thành công: Cộng tiền, lưu mã vào danh sách đã dùng
+                    usedCodes.push(code);
+                    currentBalance += 1;
+                    document.getElementById("balance").innerText = currentBalance;
+                    
+                    redeemMsg.className = "message success";
+                    redeemMsg.innerText = "Thành công! Bạn được cộng +1$.";
+                    inputField.value = ""; // Xóa trắng ô nhập
+                }
+            } else {
+                // Nhập sai mã
+                redeemMsg.className = "message error";
+                redeemMsg.innerText = "Mã không chính xác. Vui lòng nhập lại!";
+            }
+        }
+    </script>
+</body>
+</html>
