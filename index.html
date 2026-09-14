@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trung tâm nạp thẻ</title>
+<style>
+  /* ============ RESET & BIẾN ============ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-1: #070b18;
+    --bg-2: #0e1730;
+    --card: rgba(22, 31, 56, 0.85);
+    --card-2: rgba(30, 42, 74, 0.7);
+    --border: rgba(120, 160, 255, 0.16);
+    --border-hover: rgba(120, 200, 255, 0.5);
+    --text: #e8eefc;
+    --text-dim: #93a3c4;
+    --accent: #35e0c8;
+    --accent-2: #4d8dff;
+    --accent-grad: linear-gradient(135deg, #35e0c8 0%, #4d8dff 100%);
+    --danger: #ff5c7a;
+    --radius: 16px;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 12% -10%, rgba(53, 224, 200, 0.14), transparent 60%),
+      radial-gradient(900px 500px at 90% 0%, rgba(77, 141, 255, 0.18), transparent 55%),
+      linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    background-attachment: fixed;
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 40px;
+  }
+
+  /* ============ HEADER ============ */
+  header {
+    padding: 22px 16px 14px;
+    text-align: center;
+    position: relative;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(1.25rem, 4.5vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .logo .logo-icon {
+    font-size: 1.6em;
+    -webkit-text-fill-color: initial;
+    filter: drop-shadow(0 0 10px rgba(53, 224, 200, 0.5));
+  }
+  .subtitle {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .sim-banner {
+    max-width: 980px;
+    margin: 16px auto 0;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    text-align: center;
+    color: #ffe6a7;
+    background: rgba(255, 196, 0, 0.09);
+    border: 1px solid rgba(255, 196, 0, 0.3);
+  }
+
+  /* ============ LAYOUT ============ */
+  .layout {
+    max-width: 1120px;
+    margin: 22px auto 0;
+    padding: 0 14px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 900px) {
+    .layout { grid-template-columns: 1fr 340px; align-items: start; }
+    .col-side { position: sticky; top: 18px; }
+  }
+
+  /* ============ CARD ============ */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    margin-bottom: 16px;
+    animation: fadeUp 0.45s ease both;
+  }
+  .col-side .card { margin-bottom: 0; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .step-num {
+    flex: none;
+    width: 26px; height: 26px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #04121a;
+    background: var(--accent-grad);
+    box-shadow: 0 0 12px rgba(53, 224, 200, 0.45);
+  }
+  .step-title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  /* ============ 1. CHỌN GAME ============ */
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .game-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 8px;
+    border-radius: 14px;
+    background: var(--card-2);
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: 0.22s ease;
+    text-align: center;
+    user-select: none;
+  }
+  .game-item:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-3px);
+    background: rgba(45, 62, 105, 0.8);
+  }
+  .game-item.active {
+    border-color: var(--accent);
+    background: rgba(53, 224, 200, 0.1);
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 22px rgba(53, 224, 200, 0.18);
+  }
+  .game-item.active::after {
+    content: "✓";
+    position: absolute;
+    top: 7px; right: 9px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #04121a;
+    background: var(--accent);
+    width: 17px; height: 17px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+  }
+  .game-icon { font-size: 1.65rem; line-height: 1; }
+  .game-name { font-size: 0.83rem; font-weight: 600; }
+  .game-rate { font-size: 0.68rem; color: var(--text-dim); }
+
+  /* ============ 2. ID NGƯỜI CHƠI ============ */
+  .field-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 7px;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap input {
+    width: 100%;
+    padding: 13px 44px 13px 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--text);
+    background: rgba(8, 14, 30, 0.8);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    outline: none;
+    transition: 0.2s;
+  }
+  .input-wrap input::placeholder { color: #5c6b8c; }
+  .input-wrap input:focus {
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 3px rgba(77, 141, 255, 0.18);
+  }
+  .input-wrap input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(255,92,122,.15); }
+  .input-wrap .clear-btn {
+    position: absolute;
+    right: 8px; top: 50%;
+    transform: translateY(-50%);
+    width: 28px; height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    color: var(--text-dim);
+    font-size: 1rem;
+    cursor: pointer;
+    display: none;
+    place-items: center;
+    transition: 0.2s;
+  }
+  .input-wrap .clear-btn:hover { background: rgba(255,92,122,.25); color: #fff; }
+  .input-wrap.has-value .clear-btn { display: grid; }
+
+  .hint {
+    margin-top: 8px;
+    font-size: 0.74rem;
+    color: var(--text-dim);
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+  }
+  .err-msg {
+    margin-top: 8px;
+    font-size: 0.76rem;
+    color: var(--danger);
+    display: none;
+  }
+  .err-msg.show { display: block; }
+
+  /* ============ 3. MỆNH GIÁ ============ */
+  .denom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+    gap: 9px;
+  }
+  .denom-item {
+    position: relative;
+    padding: 11px 8px;
+    border-radius: 12px;
+    background: var(--card-2);
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    text-align: center;
+    transition: 0.2s ease;
+    user-select: none;
+  }
+  .denom-item:hover:not(.locked) {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+  .denom-item.active {
+    border-color: var(--accent);
+    background: rgba(53, 224, 200, 0.1);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .denom-item.locked { opacity: 0.35; cursor: not-allowed; }
+  .denom-price {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #fff;
+  }
+  .denom-value {
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-top: 3px;
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    min-height: 1.1em;
+  }
+  .denom-tag {
+    position: absolute;
+    top: -8px; right: 6px;
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 20px;
+    background: var(--danger);
+    color: #fff;
+    letter-spacing: 0.3px;
+  }
+
+  /* ============ 4. THANH TOÁN ============ */
+  .pay-list { display: grid; gap: 9px; }
+  .pay-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 13px;
+    border-radius: 12px;
+    background: var(--card-2);
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: 0.2s ease;
+    user-select: none;
+  }
+  .pay-item:hover { border-color: var(--border-hover); }
+  .pay-item.active {
+    border-color: var(--accent-2);
+    background: rgba(77, 141, 255, 0.11);
+    box-shadow: 0 0 0 1px var(--accent-2);
+  }
+  .pay-icon {
+    flex: none;
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: 1.15rem;
+    background: rgba(255,255,255,0.06);
+  }
+  .pay-name { font-size: 0.87rem; font-weight: 600; }
+  .pay-sub { font-size: 0.7rem; color: var(--text-dim); }
+  .radio {
+    margin-left: auto;
+    flex: none;
+    width: 19px; height: 19px;
+    border-radius: 50%;
+    border: 2px solid #4a5b80;
+    display: grid; place-items: center;
+    transition: 0.2s;
+  }
+  .pay-item.active .radio { border-color: var(--accent); }
+  .pay-item.active .radio::after {
+    content: "";
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* ============ SUMMARY ============ */
+  .summary-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sum-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.82rem;
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(120, 160, 255, 0.13);
+  }
+  .sum-row:last-of-type { border-bottom: none; }
+  .sum-label { color: var(--text-dim); flex: none; }
+  .sum-value {
+    text-align: right;
+    font-weight: 600;
+    word-break: break-word;
+  }
+  .sum-value.empty { color: #5c6b8c; font-weight: 400; font-style: italic; }
+
+  .sum-total {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(120, 160, 255, 0.18);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .sum-total .lbl { font-size: 0.82rem; color: var(--text-dim); }
+  .sum-total .amt {
+    font-size: 1.3rem;
+    font-weight: 800;
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .btn-pay {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: #04121a;
+    background: var(--accent-grad);
+    border: none;
+    border-radius: 13px;
+    cursor: pointer;
+    transition: 0.22s;
+    box-shadow: 0 8px 22px rgba(53, 224, 200, 0.28);
+  }
+  .btn-pay:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(53, 224, 200, 0.4); }
+  .btn-pay:active:not(:disabled) { transform: translateY(0); }
+  .btn-pay:disabled {
+    background: #2a3category;
+    background: linear-gradient(135deg, #2b3category, #2b3550);
+    background: #2b3550;
+    color: #64748b;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .secure-note {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    text-align: center;
+    color: var(--text-dim);
+  }
+
+  /* ============ MODAL ============ */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 7, 18, 0.78);
+    backdrop-filter: blur(5px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 100;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(160deg, #16203a, #101829);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.6);
+    animation: pop 0.28s ease both;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(.94) translateY(12px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal h3 {
+    font-size: 1.05rem;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .modal .modal-sub {
+    text-align: center;
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .modal-rows {
+    background: rgba(8, 14, 30, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .modal-rows .sum-row { font-size: 0.8rem; }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn {
+    flex: 1;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    border-radius: 11px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,0.07);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.13); }
+  .btn-primary {
+    background: var(--accent-grad);
+    color: #04121a;
+    box-shadow: 0 6px 18px rgba(53, 224, 200, 0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); }
+
+  /* processing */
+  .spinner {
+    width: 52px; height: 52px;
+    margin: 10px auto 18px;
+    border-radius: 50%;
+    border: 4px solid rgba(53, 224, 200, 0.18);
+    border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* success */
+  .success-icon {
+    width: 66px; height: 66px;
+    margin: 4px auto 14px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 2rem;
+    background: rgba(53, 224, 200, 0.13);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    animation: pop 0.35s ease both;
+    box-shadow: 0 0 26px rgba(53, 224, 200, 0.35);
+  }
+  .code-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(8, 14, 30, 0.7);
+    border: 1px dashed var(--accent);
+    border-radius: 11px;
+    padding: 10px 14px;
+    margin: 14px 0;
+  }
+  .code-box span { font-family: ui-monospace, "Courier New", monospace; font-weight: 700; letter-spacing: 1px; color: var(--accent); }
+  .code-box button {
+    background: rgba(53,224,200,.15);
+    border: none; color: var(--accent);
+    padding: 5px 10px; border-radius: 8px;
+    font-size: 0.7rem; font-weight: 700; cursor: pointer;
+    font-family: inherit;
+  }
+  .code-box button:hover { background: rgba(53,224,200,.3); }
+
+  .note-box {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translate(-50%, 90px);
+    background: #1c2742;
+    border: 1px solid var(--border-hover);
+    color: var(--text);
+    padding: 11px 20px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    transition: transform 0.35s cubic-bezier(.2,.9,.3,1.4), opacity .3s;
+    opacity: 0;
+    z-index: 200;
+    pointer-events: none;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 9px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2b3a5e; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3d517f; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="logo-icon">💳</span> Trung tâm nạp thẻ</div>
+  <p class="subtitle">Nạp game nhanh chóng – An toàn – Tức thì</p>
+  <div class="sim-banner">
+    ⚠️ Trang web này chỉ mang tính chất <b>MÔ PHỎNG</b> cho mục đích học tập/demo. Không có giao dịch thật nào được thực hiện.
+  </div>
+</header>
+
+<main class="layout">
+  <!-- ============ CỘT CHÍNH ============ -->
+  <div class="col-main">
+
+    <!-- BƯỚC 1: CHỌN GAME -->
+    <section class="card">
+      <div class="step-head">
+        <div class="step-num">1</div>
+        <div class="step-title">Chọn trò chơi cần nạp</div>
+      </div>
+      <div class="game-grid" id="gameGrid"></div>
+    </section>
+
+    <!-- BƯỚC 2: ID NGƯỜI CHƠI -->
+    <section class="card">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <div class="step-title">Nhập ID người chơi / Đăng nhập</div>
+      </div>
+      <label class="field-label" for="playerId">ID người chơi (UID) hoặc tên đăng nhập</label>
+      <div class="input-wrap" id="inputWrap">
+        <input type="text" id="playerId" placeholder="Chọn trò chơi trước..." autocomplete="off" spellcheck="false" disabled>
+        <button class="clear-btn" id="clearId" type="button" aria-label="Xóa">✕</button>
+      </div>
+      <div class="hint"><span>ℹ️</span><span id="idHint">Vui lòng chọn trò chơi để bắt đầu nhập ID.</span></div>
+      <div class="err-msg" id="idErr">Vui lòng nhập ID người chơi (tối thiểu 4 ký tự).</div>
+    </section>
+
+    <!-- BƯỚC 3: MỆNH GIÁ -->
+    <section class="card">
+      <div class="step-head">
+        <div class="step-num">3</div>
+        <div class="step-title">Chọn mệnh giá nạp</div>
+      </div>
+      <div class="denom-grid" id="denomGrid"></div>
+    </section>
+
+    <!-- BƯỚC 4: THANH TOÁN -->
+    <section class="card">
+      <div class="step-head">
+        <div class="step-num">4</div>
+        <div class="step-title">Phương thức thanh toán</div>
+      </div>
+      <div class="pay-list" id="payList"></div>
+    </section>
+
+  </div>
+
+  <!-- ============ CỘT TÓM TẮT ============ -->
+  <aside class="col-side">
+    <div class="card">
+      <div class="summary-title">🧾 Chi tiết đơn hàng</div>
+
+      <div class="sum-row">
+        <span class="sum-label">Trò chơi</span>
+        <span class="sum-value empty" id="sumGame">Chưa chọn</span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">ID người chơi</span>
+        <span class="sum-value empty" id="sumId">Chưa nhập</span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">Mệnh giá</span>
+        <span class="sum-value empty" id="sumAmount">Chưa chọn</span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">Nhận được</span>
+        <span class="sum-value empty" id="sumReceive">—</span>
+      </div>
+      <div class="sum-row">
+        <span class="sum-label">Thanh toán</span>
+        <span class="sum-value empty" id="sumPay">Chưa chọn</span>
+      </div>
+
+      <div class="sum-total">
+        <span class="lbl">Tổng cộng</span>
+        <span class="amt" id="sumTotal">0đ</span>
+      </div>
+
+      <button class="btn-pay" id="btnPay" disabled>XÁC NHẬN NẠP</button>
+      <div class="secure-note">🔒 Giao dịch được mã hóa & bảo mật (mô phỏng)</div>
+    </div>
+  </aside>
+</main>
+
+<!-- ============ MODAL ============ -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   DỮ LIỆU
+   ========================================================= */
+const GAMES = [
+  { id: 'fcmobile', name: 'FC Mobile VN',      unit: 'FV',       per: 10, icon: '⚽', ph: 'Ví dụ: 1234567890' },
+  { id: 'lienquan', name: 'Liên Quân Mobile',  unit: 'Quân Huy', per: 10, icon: '⚔️', ph: 'Ví dụ: 987654321' },
+  { id: 'freefire', name: 'Free Fire',         unit: 'Kim Cương',per: 25, icon: '🔥', ph: 'Ví dụ: 556677889' },
+  { id: 'roblox',   name: 'Roblox',            unit: 'Robux',    per: 15, icon: '🧱', ph: 'Ví dụ: user_name123' },
+  { id: 'delta',    name: 'Delta Force',       unit: 'Coin',     per: 20, icon: '🎯', ph: 'Ví dụ: 1122334455' },
+];
+
+const DENOMS = [5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000];
+const HOT_INDEX = 6; // 500.000đ
+
+const PAYMENTS = [
+  { id: 'shopeepay', name: 'Ví ShopeePay',                  sub: 'Thanh toán qua ví điện tử ShopeePay', icon: '🛍️' },
+  { id: 'qrpay',     name: 'QR Pay',                        sub: 'Quét mã QR bằng ứng dụng ngân hàng',  icon: '📱' },
+  { id: 'bankapp',   name: 'Thanh toán qua App Ngân Hàng',  sub: 'Internet Banking của mọi ngân hàng',  icon: '🏦' },
+  { id: 'atm',       name: 'ATM - iBanking',                sub: 'Thẻ ATM nội địa / iBanking',          icon: '💳' },
+  { id: 'card',      name: 'Credit Card / Debit Card',      sub: 'Visa, Mastercard, JCB',               icon: '💰' },
+];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  game: null,
+  playerId: '',
+  amount: null,
+  payment: null,
+};
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $ = (id) => document.getElementById(id);
+const formatVND = (n) => n.toLocaleString('vi-VN') + 'đ';
+
+/** Quy đổi: 5.000đ = `game.per` đơn vị tiền tệ trong game */
+function convert(price, game) {
+  if (!game) return 0;
+  return Math.round((price / 5000) * game.per);
+}
+
+function showToast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* =========================================================
+   RENDER: DANH SÁCH GAME
+   ========================================================= */
+function renderGames() {
+  $('gameGrid').innerHTML = GAMES.map(g => `
+    <div class="game-item" data-id="${g.id}" role="button" tabindex="0">
+      <div class="game-icon">${g.icon}</div>
+      <div class="game-name">${g.name}</div>
+      <div class="game-rate">${g.per} ${g.unit} / 5.000đ</div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.game-item').forEach(el => {
+    const handler = () => selectGame(el.dataset.id);
+    el.addEventListener('click', handler);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); }
+    });
+  });
+}
+
+function selectGame(id) {
+  state.game = GAMES.find(g => g.id === id) || null;
+  state.amount = null;               // reset mệnh giá khi đổi game
+
+  document.querySelectorAll('.game-item').forEach(el =>
+    el.classList.toggle('active', el.dataset.id === id)
+  );
+
+  // kích hoạt ô nhập ID
+  const input = $('playerId');
+  input.disabled = false;
+  input.placeholder = state.game.ph;
+  $('idHint').textContent = `Nhập ID trong game ${state.game.name} để hệ thống xác định tài khoản.`;
+
+  renderDenoms();
+  updateSummary();
+}
+
+/* =========================================================
+   RENDER: MỆNH GIÁ
+   ========================================================= */
+function renderDenoms() {
+  const grid = $('denomGrid');
+  const locked = !state.game;
+
+  grid.innerHTML = DENOMS.map((price, i) => {
+    const val = convert(price, state.game);
+    const unit = state.game ? state.game.unit : '';
+    return `
+      <div class="denom-item ${locked ? 'locked' : ''}" data-price="${price}" role="button" tabindex="${locked ? -1 : 0}">
+        ${i === HOT_INDEX ? '<span class="denom-tag">HOT</span>' : ''}
+        <div class="denom-price">${formatVND(price)}</div>
+        <div class="denom-value">${state.game ? `+${val.toLocaleString('vi-VN')} ${unit}` : 'Chọn game'}</div>
+      </div>
+    `;
+  }).join('');
+
+  if (!locked) {
+    document.querySelectorAll('.denom-item').forEach(el => {
+      const handler = () => selectAmount(Number(el.dataset.price));
+      el.addEventListener('click', handler);
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); }
+      });
+    });
+  }
+}
+
+function selectAmount(price) {
+  state.amount = price;
+  document.querySelectorAll('.denom-item').forEach(el =>
+    el.classList.toggle('active', Number(el.dataset.price) === price)
+  );
+  updateSummary();
+}
+
+/* =========================================================
+   RENDER: PHƯƠNG THỨC THANH TOÁN
+   ========================================================= */
+function renderPayments() {
+  $('payList').innerHTML = PAYMENTS.map(p => `
+    <div class="pay-item" data-id="${p.id}" role="button" tabindex="0">
+      <div class="pay-icon">${p.icon}</div>
+      <div>
+        <div class="pay-name">${p.name}</div>
+        <div class="pay-sub">${p.sub}</div>
+      </div>
+      <div class="radio"></div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.pay-item').forEach(el => {
+    const handler = () => selectPayment(el.dataset.id);
+    el.addEventListener('click', handler);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); }
+    });
+  });
+}
+
+function selectPayment(id) {
+  state.payment = PAYMENTS.find(p => p.id === id) || null;
+  document.querySelectorAll('.pay-item').forEach(el =>
+    el.classList.toggle('active', el.dataset.id === id)
+  );
+  updateSummary();
+}
+
+/* =========================================================
+   CẬP NHẬT TÓM TẮT
+   ========================================================= */
+function setVal(el, text, isEmpty) {
+  el.textContent = text;
+  el.classList.toggle('empty', !!isEmpty);
+}
+
+function updateSummary() {
+  const g = state.game;
+
+  setVal($('sumGame'), g ? g.name : 'Chưa chọn', !g);
+  setVal($('sumId'), state.playerId || 'Chưa nhập', !state.playerId);
+  setVal($('sumAmount'), state.amount ? formatVND(state.amount) : 'Chưa chọn', !state.amount);
+  setVal($('sumReceive'),
+    (g && state.amount) ? `+${convert(state.amount, g).toLocaleString('vi-VN')} ${g.unit}` : '—',
+    !(g && state.amount)
+  );
+  setVal($('sumPay'), state.payment ? state.payment.name : 'Chưa chọn', !state.payment);
+
+  $('sumTotal').textContent = state.amount ? formatVND(state.amount) : '0đ';
+
+  const ready = !!(g && state.playerId && state.playerId.length >= 4 && state.amount && state.payment);
+  $('btnPay').disabled = !ready;
+}
+
+/* =========================================================
+   Ô NHẬP ID
+   ========================================================= */
+$('playerId').addEventListener('input', (e) => {
+  let v = e.target.value.replace(/[<>]/g, '').slice(0, 40);
+  e.target.value = v;
+  state.playerId = v.trim();
+  $('inputWrap').classList.toggle('has-value', v.length > 0);
+  if (state.playerId.length >= 4) {
+    $('playerId').classList.remove('error');
+    $('idErr').classList.remove('show');
+  }
+  updateSummary();
+});
+
+$('clearId').addEventListener('click', () => {
+  const inp = $('playerId');
+  inp.value = '';
+  state.playerId = '';
+  $('inputWrap').classList.remove('has-value');
+  inp.classList.remove('error');
+  $('idErr').classList.remove('show');
+  inp.focus();
+  updateSummary();
+});
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+const overlay = $('overlay');
+const modal = $('modal');
+
+function openModal(html) {
+  modal.innerHTML = html;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  overlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay && !modal.dataset.busy) closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !modal.dataset.busy) closeModal();
+});
+
+/* =========================================================
+   XÁC NHẬN THANH TOÁN
+   ========================================================= */
+$('btnPay').addEventListener('click', () => {
+  // validate
+  if (!state.game) return showToast('⚠️ Vui lòng chọn trò chơi');
+  if (!state.playerId || state.playerId.length < 4) {
+    $('playerId').classList.add('error');
+    $('idErr').classList.add('show');
+    $('playerId').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return showToast('⚠️ Vui lòng nhập ID người chơi hợp lệ');
+  }
+  if (!state.amount) return showToast('⚠️ Vui lòng chọn mệnh giá nạp');
+  if (!state.payment) return showToast('⚠️ Vui lòng chọn phương thức thanh toán');
+
+  const g = state.game;
+  const received = convert(state.amount, g).toLocaleString('vi-VN');
+
+  openModal(`
+    <h3>Xác nhận giao dịch</h3>
+    <p class="modal-sub">Vui lòng kiểm tra kỹ thông tin trước khi thanh toán</p>
+
+    <div class="modal-rows">
+      <div class="sum-row"><span class="sum-label">Trò chơi</span><span class="sum-value">${g.name}</span></div>
+      <div class="sum-row"><span class="sum-label">ID người chơi</span><span class="sum-value">${escapeHtml(state.playerId)}</span></div>
+      <div class="sum-row"><span class="sum-label">Nhận được</span><span class="sum-value">+${received} ${g.unit}</span></div>
+      <div class="sum-row"><span class="sum-label">Thanh toán</span><span class="sum-value">${state.payment.name}</span></div>
+      <div class="sum-row"><span class="sum-label">Tổng tiền</span><span class="sum-value" style="color:var(--accent);font-weight:800">${formatVND(state.amount)}</span></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="mCancel">Hủy bỏ</button>
+      <button class="btn btn-primary" id="mConfirm">Thanh toán</button>
+    </div>
+
+    <div class="note-box">Đây là giao dịch mô phỏng, không phát sinh chi phí thực tế.</div>
+  `);
+
+  $('mCancel').addEventListener('click', closeModal);
+  $('mConfirm').addEventListener('click', processPayment);
+});
+
+function processPayment() {
+  modal.dataset.busy = '1';
+  openModal(`
+    <h3>Đang xử lý</h3>
+    <p class="modal-sub">Vui lòng không đóng cửa sổ này...</p>
+    <div class="spinner"></div>
+    <p style="text-align:center;font-size:.82rem;color:var(--text-dim)">
+      Đang kết nối tới cổng thanh toán <b style="color:var(--accent-2)">${state.payment.name}</b>
+    </p>
+  `);
+
+  setTimeout(() => {
+    delete modal.dataset.busy;
+    showSuccess();
+  }, 1900);
+}
+
+function showSuccess() {
+  const g = state.game;
+  const code = 'GD' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+  const received = convert(state.amount, g).toLocaleString('vi-VN');
+
+  openModal(`
+    <div class="success-icon">✓</div>
+    <h3 style="text-align:center">Nạp thành công!</h3>
+    <p class="modal-sub">Tiền tệ trong game đã được cộng vào tài khoản</p>
+
+    <div class="modal-rows">
+      <div class="sum-row"><span class="sum-label">Trò chơi</span><span class="sum-value">${g.name}</span></div>
+      <div class="sum-row"><span class="sum-label">ID người chơi</span><span class="sum-value">${escapeHtml(state.playerId)}</span></div>
+      <div class="sum-row"><span class="sum-label">Đã nhận</span><span class="sum-value" style="color:var(--accent)">+${received} ${g.unit}</span></div>
+      <div class="sum-row"><span class="sum-label">Số tiền</span><span class="sum-value">${formatVND(state.amount)}</span></div>
+      <div class="sum-row"><span class="sum-label">Phương thức</span><span class="sum-value">${state.payment.name}</span></div>
+    </div>
+
+    <div class="code-box">
+      <span id="txCode">${code}</span>
+      <button id="copyCode">Sao chép</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="mDone">Hoàn tất</button>
+    </div>
+
+    <div class="note-box">⚠️ Đây là giao dịch <b>MÔ PHỎNG</b> – không có giá trị thực tế.</div>
+  `);
+
+  $('copyCode').addEventListener('click', () => {
+    navigator.clipboard?.writeText(code)
+      .then(() => showToast('📋 Đã sao chép mã giao dịch'))
+      .catch(() => showToast('Không thể sao chép'));
+  });
+
+  $('mDone').addEventListener('click', () => {
+    closeModal();
+    resetAll();
+  });
+}
+
+/* =========================================================
+   RESET
+   ========================================================= */
+function resetAll() {
+  state.game = null;
+  state.playerId = '';
+  state.amount = null;
+  state.payment = null;
+
+  document.querySelectorAll('.game-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.pay-item').forEach(el => el.classList.remove('active'));
+
+  const inp = $('playerId');
+  inp.value = '';
+  inp.disabled = true;
+  inp.placeholder = 'Chọn trò chơi trước...';
+  inp.classList.remove('error');
+  $('inputWrap').classList.remove('has-value');
+  $('idErr').classList.remove('show');
+  $('idHint').textContent = 'Vui lòng chọn trò chơi để bắt đầu nhập ID.';
+
+  renderDenoms();
+  updateSummary();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('🔄 Đã làm mới phiên nạp thẻ');
+}
+
+/* =========================================================
+   UTIL
+   ========================================================= */
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+/* =========================================================
+   KHỞI TẠO
+   ========================================================= */
+renderGames();
+renderDenoms();
+renderPayments();
+updateSummary();
+</script>
+</body>
+</html>
